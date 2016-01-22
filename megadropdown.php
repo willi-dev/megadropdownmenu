@@ -70,6 +70,51 @@ class megadropdown {
 		return 'Walker_Nav_Menu_Edit_Custom'; 
 	}
 
+	/*
+	 * add mega menu support
+	 */
+	function md_nav_menu_object($items, $args = '') {
+		$items_buff = array();
+
+		$megadropdown_menu_cat = get_post_meta($item->ID, $category_key_post_meta, true);
+
+		foreach ($items as &$item) {
+			// $item->is_mega_menu = false;
+
+			if($megadropdown_menu_cat != ''){
+				$item->classes[] = '';
+				$item->classes[] = '';
+				$items_buff[] = $item;
+
+				// generate wp post
+				$new_item = $this->generate_post();
+
+
+			}
+		}
+	}
+
+	function generate_post() {
+        $post = new stdClass;
+        $post->ID = 0;
+        $post->post_author = '';
+        $post->post_date = '';
+        $post->post_date_gmt = '';
+        $post->post_password = '';
+        $post->post_type = 'menu_tds';
+        $post->post_status = 'publish';
+        $post->to_ping = '';
+        $post->pinged = '';
+        $post->comment_status = '';
+        $post->ping_status = '';
+        $post->post_pingback = '';
+        //$post->post_category = '';
+        $post->page_template = 'default';
+        $post->post_parent = 0;
+        $post->menu_order = 0;
+        return new WP_Post($post);
+    }
+
 }
 
 // instatiate plugin's class

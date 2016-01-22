@@ -175,14 +175,9 @@ class Walker_Nav_Menu_Edit_Custom extends Walker_Nav_Menu {
 	            </p>   
 
 	            <?php
-	            /* New fields insertion starts here */
-	            
-				$control_buffy = '';
-
+	            /* New fields (select category for megamenu) starts here */
 				$category_key_post_meta = 'megadropdown_menu_cat';
-
 				$megadropdown_menu_cat = get_post_meta($item->ID, $category_key_post_meta, true);
-
 				$cat_tree = array_merge(
 					array(' - not mega dropdown menu - ' => ''),
 					$this->get_category_array(false)
@@ -190,26 +185,18 @@ class Walker_Nav_Menu_Edit_Custom extends Walker_Nav_Menu {
 
 				?>
 				<p class="description description-wide">
-				<label>Category Mega Dropdown</label><br>
-				<select name="<?php echo $category_key_post_meta;?>[<?php echo $item->ID;?>]" id="" class="widefat code edit-menu-item-url">'
+					<label>Category Mega Dropdown</label><br>
+						<select name="<?php echo esc_attr($category_key_post_meta);?>[<?php echo esc_attr($item->ID);?>]" id="" class="widefat code edit-menu-item-url">
 				<?php 
 
-					foreach ($cat_tree as $category => $category_id) {
+						foreach ($cat_tree as $category => $category_id) {
 				?>
-						<option value="<?php echo $category_id;?>" <?php echo selected($megadropdown_menu_cat, $category_id, false);?>><?php echo $category;?></option>
+							<option value="<?php echo esc_attr($category_id);?>" <?php echo selected($megadropdown_menu_cat, $category_id, false);?>><?php echo $category;?></option>
 				<?php 
-					}
+						}
 				?>
-				</select>
-					<?php
-					//if(sizeof($cat_tree)>0){
-					//	print_r($cat_tree);
-					// }
-					?>
+						</select>
 				</p>
-	            <?php
-	            /* New fields insertion ends here */
-	            ?>
 
 	            <div class="menu-item-actions description-wide submitbox">
 	                <?php if( 'custom' != $item->type && $original_title !== false ) : ?>
@@ -260,15 +247,14 @@ class Walker_Nav_Menu_Edit_Custom extends Walker_Nav_Menu {
 
         if (empty($cat_array_walker_buffer)) {
             $categories = get_categories(array(
-                'hide_empty' => 0,
-                'number' => 1000
+                'hide_empty' 	=> 0,
+                'number' 		=> 1000
             ));
 
             $cat_array_walker = new cat_array_walker;
             $cat_array_walker->walk($categories, 4);
             $cat_array_walker_buffer = $cat_array_walker->array_buffer;
         }
-
 
         if ($add_all_category === true) {
             $categories_buffer['- All categories -'] = '';
@@ -295,15 +281,12 @@ class cat_array_walker extends Walker {
     function end_lvl( &$output, $depth = 0, $args = array() ) {
     }
 
-
     function start_el( &$output, $category, $depth = 0, $args = array(), $id = 0 ) {
         $this->array_buffer[str_repeat(' - ', $depth) .  $category->name] = $category->term_id;
     }
 
-
     function end_el( &$output, $page, $depth = 0, $args = array() ) {
     }
-
 }
 
 
