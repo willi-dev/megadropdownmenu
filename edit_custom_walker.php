@@ -8,7 +8,7 @@
  * @since 3.0.0
  * @uses Walker_Nav_Menu
  */
-class Walker_Nav_Menu_Edit_Custom extends Walker_Nav_Menu  {
+class Walker_Nav_Menu_Edit_Custom extends Walker_Nav_Menu {
 	/**
 	 * @see Walker_Nav_Menu::start_lvl()
 	 * @since 3.0.0
@@ -36,8 +36,10 @@ class Walker_Nav_Menu_Edit_Custom extends Walker_Nav_Menu  {
 	 * @param int $depth Depth of menu item. Used for padding.
 	 * @param object $args
 	 */
-	function start_el(&$output, $item, $depth, $args) {
-	    global $_wp_nav_menu_max_depth;
+	
+	function start_el(&$output, $item, $depth = 0, $args = array(), $id = 0) {
+		
+		global $_wp_nav_menu_max_depth;
 	   
 	    $_wp_nav_menu_max_depth = $depth > $_wp_nav_menu_max_depth ? $depth : $_wp_nav_menu_max_depth;
 	
@@ -170,19 +172,45 @@ class Walker_Nav_Menu_Edit_Custom extends Walker_Nav_Menu  {
 	                    <textarea id="edit-menu-item-description-<?php echo $item_id; ?>" class="widefat edit-menu-item-description" rows="3" cols="20" name="menu-item-description[<?php echo $item_id; ?>]"><?php echo esc_html( $item->description ); // textarea_escaped ?></textarea>
 	                    <span class="description"><?php _e('The description will be displayed in the menu if the current theme supports it.'); ?></span>
 	                </label>
-	            </p>        
+	            </p>   
+
 	            <?php
 	            /* New fields insertion starts here */
-	            ?>      
-	            <p class="field-custom description description-wide">
-	                <label for="edit-menu-item-subtitle-<?php echo $item_id; ?>">
-	                    <?php _e( 'Subtitle' ); ?><br />
-	                    <input type="text" id="edit-menu-item-subtitle-<?php echo $item_id; ?>" class="widefat code edit-menu-item-custom" name="menu-item-subtitle[<?php echo $item_id; ?>]" value="<?php echo esc_attr( $item->subtitle ); ?>" />
-	                </label>
-	            </p>
+	            
+				$control_buffy = '';
+
+				$category_key_post_meta = 'megadropdown_menu_cat';
+
+				$megadropdown_menu_cat = get_post_meta($item->ID, $category_key_post_meta, true);
+
+				$cat_tree = array_merge(
+					array(' - not mega dropdown menu - ' => ''),
+					$this->get_category_array(false)
+				);
+
+				?>
+				<p class="description description-wide">
+				<label>Category Mega Dropdown</label><br>
+				<select name="<?php echo $category_key_post_meta;?>[<?php echo $item->ID;?>]" id="" class="widefat code edit-menu-item-url">'
+				<?php 
+
+					foreach ($cat_tree as $category => $category_id) {
+				?>
+						<option value="<?php echo $category_id;?>" <?php echo selected($megadropdown_menu_cat, $category_id, false);?>><?php echo $category;?></option>
+				<?php 
+					}
+				?>
+				</select>
+					<?php
+					//if(sizeof($cat_tree)>0){
+					//	print_r($cat_tree);
+					// }
+					?>
+				</p>
 	            <?php
 	            /* New fields insertion ends here */
 	            ?>
+
 	            <div class="menu-item-actions description-wide submitbox">
 	                <?php if( 'custom' != $item->type && $original_title !== false ) : ?>
 	                    <p class="link-to-original">
@@ -215,5 +243,67 @@ class Walker_Nav_Menu_Edit_Custom extends Walker_Nav_Menu  {
 	    
 	    $output .= ob_get_clean();
 
-	    }
+	}
+
+
+	/**
+     * generates a category tree
+     * @param bool $add_all_category = if true 
+     * ads - All categories - at the begining of the list (used for dropdowns)
+     */
+    static $cat_array_walker_buffer = array();
+    static function get_category_array($add_all_category = true) {
+
+        if (is_admin() === false) {
+            return;
+        }
+
+        if (empty($cat_array_walker_buffer)) {
+            $categories = get_categories(array(
+                'hide_empty' => 0,
+                'number' => 1000
+            ));
+
+            $cat_array_walker = new cat_array_walker;
+            $cat_array_walker->walk($categories, 4);
+            $cat_array_walker_buffer = $cat_array_walker->array_buffer;
+        }
+
+
+        if ($add_all_category === true) {
+            $categories_buffer['- All categories -'] = '';
+            return array_merge(
+                $categories_buffer,
+                $cat_array_walker_buffer
+            );
+        } else {
+            return $cat_array_walker_buffer;
+        }
+    }
 }
+
+
+class cat_array_walker extends Walker {
+    var $tree_type = 'category';
+    var $db_fields = array ('parent' => 'parent', 'id' => 'term_id');
+
+    var $array_buffer = array();
+
+    function start_lvl( &$output, $depth = 0, $args = array() ) {
+    }
+
+    function end_lvl( &$output, $depth = 0, $args = array() ) {
+    }
+
+
+    function start_el( &$output, $category, $depth = 0, $args = array(), $id = 0 ) {
+        $this->array_buffer[str_repeat(' - ', $depth) .  $category->name] = $category->term_id;
+    }
+
+
+    function end_el( &$output, $page, $depth = 0, $args = array() ) {
+    }
+
+}
+
+
