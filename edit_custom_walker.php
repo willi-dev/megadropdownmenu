@@ -15,7 +15,7 @@ class Walker_Nav_Menu_Edit_Custom extends Walker_Nav_Menu {
 	 *
 	 * @param string $output Passed by reference.
 	 */
-	function start_lvl(&$output) {	
+	function start_lvl(&$output,  $depth = 0, $args= array()) {	
 	}
 	
 	/**
@@ -24,7 +24,7 @@ class Walker_Nav_Menu_Edit_Custom extends Walker_Nav_Menu {
 	 *
 	 * @param string $output Passed by reference.
 	 */
-	function end_lvl(&$output) {
+	function end_lvl(&$output,  $depth = 0, $args= array()) {
 	}
 	
 	/**

@@ -28,8 +28,8 @@ class megadropdown {
 			add_filter('wp_edit_nav_menu_walker', array($this, 'md_edit_nav_menu_walker'), 10, 2);
 		}
 
-		// add filter wp nav menu object
-		// add_filter('wp_nav_menu_object', array(), 10, 2);
+		// add filter wp nav menu objects
+		add_filter('wp_nav_menu_objects', array($this, 'md_nav_menu_object'), 10, 2);
 
 	}
 	// end of constructor 
@@ -75,34 +75,44 @@ class megadropdown {
 	 */
 	function md_nav_menu_object($items, $args = '') {
 		$items_buff = array();
-
-		$megadropdown_menu_cat = get_post_meta($item->ID, $category_key_post_meta, true);
-
+		$category_key_post_meta = 'megadropdown_menu_cat';
+		// print_r($items);
 		foreach ($items as &$item) {
 			// $item->is_mega_menu = false;
-
+			$megadropdown_menu_cat = get_post_meta($item->ID, $category_key_post_meta, true);
+			// print_r($megadropdown_menu_cat);
 			if($megadropdown_menu_cat != ''){
-				$item->classes[] = '';
+				$item->classes[] = 'md_menuitem';
 				$item->classes[] = '';
 				$items_buff[] = $item;
 
 				// generate wp post
 				$new_item = $this->generate_post();
 
+				$new_item->is_mega_menu = true;
+				$new_item->menu_item_parent = $item->ID;
+				$new_item->cat_id = $megadropdown_menu_cat; // category id
+				$new_item->url = '';
+				$new_item->title = '<div class="block_megamenu"><div class="block_megagrid">'; // open tag for mega menu
+				$new_item->title .= ''; // render content of mega menu here
 
+				$new_item->title .= '</div></div>'; // close tag for mega menu
+				$items_buff[] = $new_item;
 			}
 		}
+		print_r($items_buff);
+		return $items_buff;
 	}
 
 	function generate_post() {
         $post = new stdClass;
-        $post->ID = 0;
+        $post->ID = '0';
         $post->post_author = '';
         $post->post_date = '';
         $post->post_date_gmt = '';
         $post->post_password = '';
-        $post->post_type = 'menu_tds';
-        $post->post_status = 'publish';
+        $post->post_type = '';
+        $post->post_status = 'draft';
         $post->to_ping = '';
         $post->pinged = '';
         $post->comment_status = '';
@@ -113,6 +123,12 @@ class megadropdown {
         $post->post_parent = 0;
         $post->menu_order = 0;
         return new WP_Post($post);
+    }
+     /**
+      * render post
+      */
+    function render_post($atts, $content = null){
+    	
     }
 
 }
