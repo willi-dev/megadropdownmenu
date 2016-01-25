@@ -12,6 +12,7 @@ Domain Path: languages
 */
 
 class megadropdown {
+	var $is_mobile = true; // if mobile
 
 	// constructor 
 	function __construct() {
@@ -94,13 +95,17 @@ class megadropdown {
 				$new_item->cat_id = $megadropdown_menu_cat; // category id
 				$new_item->url = '';
 				$new_item->title = '<div class="block_megamenu"><div class="block_megagrid">'; // open tag for mega menu
+				
 				$new_item->title .= ''; // render content of mega menu here
-
+				$querypostbyCat = new WP_Query(
+						array( 'cat' => $megadropdown_menu_cat)
+						);
+				$new_item->title .= $this->render_inner($querypostbyCat->posts);
 				$new_item->title .= '</div></div>'; // close tag for mega menu
 				$items_buff[] = $new_item;
 			}
 		}
-		print_r($items_buff);
+		// print_r($items_buff);
 		return $items_buff;
 	}
 
@@ -112,7 +117,7 @@ class megadropdown {
         $post->post_date_gmt = '';
         $post->post_password = '';
         $post->post_type = '';
-        $post->post_status = 'draft';
+        $post->post_status = 'publish';
         $post->to_ping = '';
         $post->pinged = '';
         $post->comment_status = '';
@@ -127,10 +132,41 @@ class megadropdown {
      /**
       * render post
       */
-    function render_post($atts, $content = null){
-    	
+    // function render_post($atts, $content = null){
+
+    // }
+    function render_inner($posts){
+    	$buff = '';
+    	if(!empty($posts)) {
+    		$buff .= '<div class="megamenu-row">';
+    		foreach ($posts as $post) {
+    			$buff .= '<div class="megamenu-span">';
+    			$buff .= '<a href="'. $this->get_href($post) .'">';
+    			$buff .= $post->post_title;
+    			$buff .= $this->image_post($post);
+    			$buff .= '</a>';
+    			$buff .= '</div>';
+    		}
+    		$buff .= '</div>';
+    	}
+    	return $buff;
     }
 
+    function image_post($post){
+    	$thumbs='';
+    	if( has_post_thumbnail( $post->ID) ){
+
+            $thumbs = get_the_post_thumbnail( $post->ID );
+    	}else{
+    		$thumbs = '';
+    	}
+    	return $thumbs;
+    }
+
+    function get_href($post){
+    	$url='';
+    	return $url=esc_url(get_permalink($post->ID));
+    }
 }
 
 // instatiate plugin's class
