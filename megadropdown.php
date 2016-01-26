@@ -14,12 +14,10 @@ Domain Path: languages
 class megadropdown {
 	var $is_mobile = true; // if mobile
 
-	// constructor 
+	/**
+	 * Constructor
+	 */
 	function __construct() {
-
-		// add filter for add custom field
-		// add_filter('wp_setup_nav_menu_item', array($this, 'md_add_custom_category'));
-
 		if(is_admin()) {
 
 			// add action for save custom field
@@ -32,22 +30,28 @@ class megadropdown {
 		// add filter wp nav menu objects
 		add_filter('wp_nav_menu_objects', array($this, 'md_nav_menu_object'), 10, 2);
 
+		// add action for stylesheet
+		add_action('wp_enqueue_scripts', array( $this, 'load_style'));
+
+
 	}
 	// end of constructor 
 
-	/*
-	 * add custom field
-	 * load category ? 
-	 * to $item nav object
+	/**
+	 * Load stylesheet for mega dropdown menu plugin
+	 * @param -
 	 */
-	function md_add_custom_category ( $menu_item ) {
-		$menu_item->subtitle = get_post_meta($menu_item->ID, '_menu_item_subtitle', true);
-		return $menu_item;
+	public function load_style() {
+		wp_register_style('megamenu-style', plugins_url('megadropdownmenu/css/megadropdown.css') );
+		wp_enqueue_style('megamenu-style');
 	}
 
 	/*
 	 * save custom field 
 	 * md_update_custom_category
+	 * @param $menu_id
+	 * @param $menu_item_db_id
+	 * @param args
 	 */
 	function md_update_custom_category( $menu_id, $menu_item_db_id, $args ){
 		// check if element is properly sent
@@ -63,7 +67,9 @@ class megadropdown {
 
 	/*
 	 * edit / custom field in admin
-	 * md_edit_walker 
+	 * md_edit_nav_menu_walker
+	 * @param $walker
+	 * @param $menu_id
 	 */
 	function md_edit_nav_menu_walker( $walker, $menu_id ){
 		// walker_nav_menu_edit_custom from edit_custom_walker.php
@@ -73,10 +79,14 @@ class megadropdown {
 
 	/*
 	 * add mega menu support
+	 * @param $items
+	 * @param $args
+	 * @return array
 	 */
 	function md_nav_menu_object($items, $args = '') {
 		$items_buff = array();
 		$category_key_post_meta = 'megadropdown_menu_cat';
+		
 		// print_r($items);
 		foreach ($items as &$item) {
 			// $item->is_mega_menu = false;
@@ -95,20 +105,30 @@ class megadropdown {
 				$new_item->cat_id = $megadropdown_menu_cat; // category id
 				$new_item->url = '';
 				$new_item->title = '<div class="block_megamenu"><div class="block_megagrid">'; // open tag for mega menu
-				
-				$new_item->title .= ''; // render content of mega menu here
+				// query post by category
 				$querypostbyCat = new WP_Query(
 						array( 'cat' => $megadropdown_menu_cat)
 						);
+				// render result query
 				$new_item->title .= $this->render_inner($querypostbyCat->posts);
+				
 				$new_item->title .= '</div></div>'; // close tag for mega menu
 				$items_buff[] = $new_item;
+			}else{
+				$item->classes[] = 'md_menuitem';
+				$item->classes[] = '';
+				$items_buff[] = $item;
 			}
 		}
 		// print_r($items_buff);
 		return $items_buff;
 	}
 
+	/**
+	 * generate_post
+	 * @param -
+	 * @return WP_Post()
+	 */
 	function generate_post() {
         $post = new stdClass;
         $post->ID = '0';
@@ -130,11 +150,10 @@ class megadropdown {
         return new WP_Post($post);
     }
      /**
-      * render post
+      * render inner post
+      * @param $posts
+      * @return div megamenu 
       */
-    // function render_post($atts, $content = null){
-
-    // }
     function render_inner($posts){
     	$buff = '';
     	if(!empty($posts)) {
@@ -152,29 +171,55 @@ class megadropdown {
     	return $buff;
     }
 
+    /**
+     * image_post
+     * @param $post
+     * @return featured image of post
+     */
     function image_post($post){
     	$thumbs='';
     	if( has_post_thumbnail( $post->ID) ){
 
-            $thumbs = get_the_post_thumbnail( $post->ID );
+            $thumbs = get_the_post_thumbnail( $post->ID , 'post-thumbnail');
     	}else{
     		$thumbs = '';
     	}
     	return $thumbs;
     }
 
+    /**
+     * get_href
+     * @param $post
+     * @return url / href / permalink of post
+     */
     function get_href($post){
     	$url='';
-    	return $url=esc_url(get_permalink($post->ID));
+    	return $url = esc_url(get_permalink($post->ID));
     }
+
+    /**
+     * register nav menu
+     *
+     */
+    function register_menu() {
+    	register_nav_menu(
+    		array(
+    			'menu' 			=> 'main',  // md_walker class for megamenu
+				'walker' 		=> new md_walker, // md_walker for megamenu 
+				'menu_class' 	=> 'nav navbar-nav'
+    			)
+    	);
+    }
+
 }
 
 // instatiate plugin's class
 new megadropdown();
 
+// front end menu generates here!
+include_once('custom_walker.php');
+
 // add custom field to admin menu panel
 include_once('edit_custom_walker.php');
 
-// front end menu generates here!
-include_once('custom_walker.php');
 
