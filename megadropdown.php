@@ -34,8 +34,14 @@ class megadropdown {
 
 		// add action for stylesheet
 		add_action('wp_enqueue_scripts', array( $this, 'load_style'));
+		
+		// add action for script js
+		add_action('wp_enqueue_scripts', array( $this, 'load_script'));
 
+		add_action( 'wp_ajax_nopriv_MyAjaxFunction', array($this, 'MyAjaxFunction') );
+   		add_action( 'wp_ajax_MyAjaxFunction', array($this, 'MyAjaxFunction') );
 
+   		
 	}
 	// end of constructor 
 
@@ -62,6 +68,17 @@ class megadropdown {
 	function load_style() {
 		wp_register_style('megamenu-style', plugins_url('megadropdownmenu/css/megadropdown.css') );
 		wp_enqueue_style('megamenu-style');
+	}
+
+	/**
+	 * load script js / jquery for mega dropwon menu plugin
+	 * @param -
+	 */
+	function load_script() {
+		// wp_register_script('megamenu-js', plugins_url('megadropdownmenu/js/megamenuscript.js'));
+		// wp_enqueue_script('megamenu-js');
+		wp_enqueue_script('megamenu-js', plugins_url('megadropdownmenu/js/megamenuscript.js') , array('jquery'), '1.0', true );
+		wp_localize_script( 'megamenu-js', 'the_ajax_script', array( 'ajaxurl' => admin_url( 'admin-ajax.php' ) ) );
 	}
 
 	/*
@@ -136,7 +153,9 @@ class megadropdown {
 						);
 				// render result query
 				$new_item->title .= $this->render_inner($querypostbyCat->posts);
+
 				$new_item->title .= '</div>'; // close tag for mega menu
+
 				$items_buff[] = $new_item;
 
 				// print_r($item);
@@ -147,7 +166,7 @@ class megadropdown {
 
 				$items_buff[] = $item;
 
-				print_r($item);
+				// print_r($item);
 			}
 		}
 		// print_r($items_buff);
@@ -166,7 +185,7 @@ class megadropdown {
         $post->post_date = '';
         $post->post_date_gmt = '';
         $post->post_password = '';
-        $post->post_type = '';
+        $post->post_type = 'nav_menu_item';
         $post->post_status = 'publish';
         $post->to_ping = '';
         $post->pinged = '';
@@ -209,7 +228,7 @@ class megadropdown {
     function image_post($post){
     	$thumbs='';
     	if( has_post_thumbnail( $post->ID) ){
-            $thumbs = get_the_post_thumbnail( $post->ID , $size='', array( 'class' => 'img-responsive' ) );
+            $thumbs = get_the_post_thumbnail( $post->ID , $size='', array( 'class' => 'img-responsive center-block' ) );
     	}else{
     		$thumbs = '';
     	}
@@ -226,6 +245,15 @@ class megadropdown {
     	return $url = esc_url(get_permalink($post->ID));
     }
 
+    // function 
+
+	function MyAjaxFunction(){
+		//get the data from ajax() call
+		$GreetingAll = $_POST['GreetingAll'];
+		$results = "<h2>".$GreetingAll."</h2>";
+		// Return the String
+		die($results);
+	}
 
 }
 

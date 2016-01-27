@@ -9,25 +9,17 @@
 class md_walker extends Walker_Nav_Menu {
 
 	function start_lvl(&$output,  $depth = 0, $args= array()) {	
-		// depth dependent classes
-		// $indent        = ( $depth > 0 ? str_repeat( "\t", $depth ) : '' ); // code indent
-		// $display_depth = ( $depth + 1 ); // because it counts the first submenu as 0
-		// $classes       = array(
-		// 	( $display_depth % 2 ? 'megadropdownfull' : '' ),
-		// 	'menu-depth-' . $display_depth,
-		// 	'dropdown-menu',
-		// );
-		// $class_names   = implode( ' ', $classes );
-
 		$indent        	= str_repeat( "\t", $depth ); 
 		$class_names	= 'dropdown-menu';
 		// build html
 		$output .= "\n" . $indent . '<ul class="' . $class_names . '">' . "\n";
+		// $output .= '<div><a href="#">Prev</a> | <a href="#">Next</a></div>';
 	}
 
 	function start_el(&$output, $item, $depth = 0, $args = array(), $id = 0) {
 	    
-       	global $wp_query;
+       	global $wp_query, $wpdb, $wpdb2;
+
        	$indent = ( $depth ) ? str_repeat( "\t", $depth ) : '';
 
        	$class_names = $value = '';
@@ -50,7 +42,9 @@ class md_walker extends Walker_Nav_Menu {
        	$id = apply_filters( 'nav_menu_item_id', 'menu-item-'. $item->ID, $item, $args );
 
        	$id = $id ? ' id="' . esc_attr( $id ) . '"' : '';
-
+       	if($item->is_mega_menu == true){
+       		$output .= '<div><a href="#">Prev</a> | <a href="#">Next</a></div>';
+       	}
        	$output .= $indent . '<li id=" menu-item-'. $item->ID . '"' . $value . $class_names .'>';
 
        	$atts = array();
@@ -83,10 +77,28 @@ class md_walker extends Walker_Nav_Menu {
 
         // $item_output .= $description.$args->link_after;
 
+        $has_children = $wpdb->get_var("SELECT COUNT(meta_id)
+                            FROM wp_postmeta
+                            WHERE meta_key='_menu_item_menu_item_parent'
+                            AND meta_value='".$item->ID."'");
+        if($depth == 0 && $has_children > 0){
+        	$item_output .= '&nbsp;<span class="caret '.$item->is_mega_menu.'"></span>';
+        }
+       
+
+		if($item->is_mega_menu == true){
+			$item_output .= '&nbsp;<span class="caret '.$item->is_mega_menu.'"></span>';
+		}
+
+        /*if($depth == 0 && ($item->is_mega_menu == true)){
+        	$item_output .= '&nbsp;<span class="caret '.$item->is_mega_menu.'"></span>';
+        }*/
+
         if ($item->is_mega_menu == false) {
             // $item_output .= '&nbsp;<span class="caret '.$item->is_mega_menu.'"></span></a>';
             $item_output .= '</a>';
         }
+
         $item_output .= $args->after;
 
         $output .= apply_filters( 'walker_nav_menu_start_el', $item_output, $item, $depth, $args );
