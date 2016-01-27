@@ -18,6 +18,8 @@ class megadropdown {
 	 * Constructor
 	 */
 	function __construct() {
+		// add_action( 'init', array($this, 'register_menu'));
+
 		if(is_admin()) {
 
 			// add action for save custom field
@@ -37,11 +39,27 @@ class megadropdown {
 	}
 	// end of constructor 
 
+    /**
+     * register nav menu
+     *
+     */
+    function register_menu() {
+    	register_nav_menus(
+    		array(
+    			'theme_location' 	=> 'primary', 
+				'menu_id' 			=> 'primary-menu-megadropdown',
+    			'menu' 			=> 'main',  // md_walker class for megamenu
+				'walker' 		=> new md_walker, // md_walker for megamenu 
+				'menu_class' 	=> 'nav navbar-nav megadropdown'
+    			)
+    	);
+    }
+
 	/**
 	 * Load stylesheet for mega dropdown menu plugin
 	 * @param -
 	 */
-	public function load_style() {
+	function load_style() {
 		wp_register_style('megamenu-style', plugins_url('megadropdownmenu/css/megadropdown.css') );
 		wp_enqueue_style('megamenu-style');
 	}
@@ -89,35 +107,47 @@ class megadropdown {
 		
 		// print_r($items);
 		foreach ($items as &$item) {
-			// $item->is_mega_menu = false;
+			$item->is_mega_menu = false;
+
 			$megadropdown_menu_cat = get_post_meta($item->ID, $category_key_post_meta, true);
-			// print_r($megadropdown_menu_cat);
+			// echo $megadropdown_menu_cat."</br>";
 			if($megadropdown_menu_cat != ''){
 				$item->classes[] = 'md_menuitem';
-				$item->classes[] = '';
+				$item->classes[] = 'is_megamenu dropdown';
+
 				$items_buff[] = $item;
+				// $items_buff[] .= $caret;
 
 				// generate wp post
 				$new_item = $this->generate_post();
+				// print_r($new_item);
 
 				$new_item->is_mega_menu = true;
 				$new_item->menu_item_parent = $item->ID;
 				$new_item->cat_id = $megadropdown_menu_cat; // category id
 				$new_item->url = '';
-				$new_item->title = '<div class="block_megamenu"><div class="block_megagrid">'; // open tag for mega menu
+				$new_item->title = '<div class="block_megamenu">'; // open tag for mega menu
 				// query post by category
 				$querypostbyCat = new WP_Query(
-						array( 'cat' => $megadropdown_menu_cat)
+							array( 
+									'cat' => $megadropdown_menu_cat,
+									'posts_per_page' => 4
+								)
 						);
 				// render result query
 				$new_item->title .= $this->render_inner($querypostbyCat->posts);
-				
-				$new_item->title .= '</div></div>'; // close tag for mega menu
+				$new_item->title .= '</div>'; // close tag for mega menu
 				$items_buff[] = $new_item;
+
+				// print_r($item);
 			}else{
+
 				$item->classes[] = 'md_menuitem';
-				$item->classes[] = '';
+				$item->classes[] = 'dropdown is_not_megamenu';
+
 				$items_buff[] = $item;
+
+				print_r($item);
 			}
 		}
 		// print_r($items_buff);
@@ -157,11 +187,11 @@ class megadropdown {
     function render_inner($posts){
     	$buff = '';
     	if(!empty($posts)) {
-    		$buff .= '<div class="megamenu-row">';
+    		$buff .= '<div class="row">';
     		foreach ($posts as $post) {
-    			$buff .= '<div class="megamenu-span">';
-    			$buff .= '<a href="'. $this->get_href($post) .'">';
-    			$buff .= $post->post_title;
+    			$buff .= '<div class="megamenu-span col-md-3">';
+    			$buff .= '<a href="'. $this->get_href($post) .'" >';
+    			$buff .= ''.$post->post_title.'';
     			$buff .= $this->image_post($post);
     			$buff .= '</a>';
     			$buff .= '</div>';
@@ -179,8 +209,7 @@ class megadropdown {
     function image_post($post){
     	$thumbs='';
     	if( has_post_thumbnail( $post->ID) ){
-
-            $thumbs = get_the_post_thumbnail( $post->ID , 'post-thumbnail');
+            $thumbs = get_the_post_thumbnail( $post->ID , $size='', array( 'class' => 'img-responsive' ) );
     	}else{
     		$thumbs = '';
     	}
@@ -197,19 +226,6 @@ class megadropdown {
     	return $url = esc_url(get_permalink($post->ID));
     }
 
-    /**
-     * register nav menu
-     *
-     */
-    function register_menu() {
-    	register_nav_menu(
-    		array(
-    			'menu' 			=> 'main',  // md_walker class for megamenu
-				'walker' 		=> new md_walker, // md_walker for megamenu 
-				'menu_class' 	=> 'nav navbar-nav'
-    			)
-    	);
-    }
 
 }
 
