@@ -76,4 +76,9 @@ ul.megadropdown li.is_megamenu:hover .dropdown-menu{
 	position: absolute;
 	z-index: 100;
 }
+.row_next_prev{
+	height:30px;
+	margin: 0 10px;
+	
+}
 

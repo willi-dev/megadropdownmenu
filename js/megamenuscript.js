@@ -1,7 +1,7 @@
 jQuery(document).ready(function() {
     var GreetingAll = jQuery("#GreetingAll").val();
-    jQuery("#PleasePushMe").click(function(){ 
-
+    jQuery("#PleasePushMe").click(function(e){ 
+        e.preventDefault();
    
         jQuery.ajax({
             type: 'POST',
@@ -28,7 +28,15 @@ jQuery(document).ready(function() {
 
     jQuery('#page').hide().fadeIn();
 
+    /* ================================================================== */
+
+    
+
 });
+
+/*
+ *
+ */
 
 (function($){
     

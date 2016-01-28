@@ -122,6 +122,7 @@ class megadropdown {
 		$items_buff = array();
 		$category_key_post_meta = 'megadropdown_menu_cat';
 		
+		$found_posts = '';
 		// print_r($items);
 		foreach ($items as &$item) {
 			$item->is_mega_menu = false;
@@ -133,12 +134,9 @@ class megadropdown {
 				$item->classes[] = 'is_megamenu dropdown';
 
 				$items_buff[] = $item;
-				// $items_buff[] .= $caret;
 
 				// generate wp post
 				$new_item = $this->generate_post();
-				// print_r($new_item);
-
 				$new_item->is_mega_menu = true;
 				$new_item->menu_item_parent = $item->ID;
 				$new_item->cat_id = $megadropdown_menu_cat; // category id
@@ -151,14 +149,14 @@ class megadropdown {
 									'posts_per_page' => 4
 								)
 						);
+
+				$new_item->found_posts = $querypostbyCat->found_posts;
 				// render result query
-				$new_item->title .= $this->render_inner($querypostbyCat->posts);
+				$new_item->title .= $this->render_inner($querypostbyCat->posts/*$found_posts*/);
 
 				$new_item->title .= '</div>'; // close tag for mega menu
-
+				
 				$items_buff[] = $new_item;
-
-				// print_r($item);
 			}else{
 
 				$item->classes[] = 'md_menuitem';
@@ -169,6 +167,8 @@ class megadropdown {
 				// print_r($item);
 			}
 		}
+
+
 		// print_r($items_buff);
 		return $items_buff;
 	}
@@ -203,10 +203,12 @@ class megadropdown {
       * @param $posts
       * @return div megamenu 
       */
-    function render_inner($posts){
+    function render_inner($posts /*$found_posts*/){
     	$buff = '';
     	if(!empty($posts)) {
     		$buff .= '<div class="row">';
+    		// $buff .= '<div class="'. $found_post .'"><a href="#">Prev</a> | <a href="#">Next</a></div>';
+    		// print_r($found_post);
     		foreach ($posts as $post) {
     			$buff .= '<div class="megamenu-span col-md-3">';
     			$buff .= '<a href="'. $this->get_href($post) .'" >';

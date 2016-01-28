@@ -32,7 +32,7 @@ class md_walker extends Walker_Nav_Menu {
 
        	// $classes[] = ($has_children) ? 'dropdown' : '';
        
-       	$classes[] = ($item->is_mega_menu == true) ? 'list_megamenu' : '';
+       	$classes[] = ($item->is_mega_menu == true) ? 'list_megamenu-'.$item->is_mega_menu : '';
 
        	$class_names = join( ' ', apply_filters( 'nav_menu_css_class', array_filter( $classes ), $item , $args) );
        	$class_names = ' class="'. esc_attr( $class_names ) . '"';
@@ -42,13 +42,23 @@ class md_walker extends Walker_Nav_Menu {
        	$id = apply_filters( 'nav_menu_item_id', 'menu-item-'. $item->ID, $item, $args );
 
        	$id = $id ? ' id="' . esc_attr( $id ) . '"' : '';
-       	if($item->is_mega_menu == true){
-       		$output .= '<div><a href="#">Prev</a> | <a href="#">Next</a></div>';
+
+       	$output .= $indent . '<li id="menu-item-'. $item->ID . '"' . $value . $class_names .'>';
+
+       	if($item->is_mega_menu == '1'){
+       		if($item->found_posts > 4){
+	       		$output .= '<div class=" row_next_prev hidden-xs">
+	       						<div class="" style="">
+	       							<a href="#" class="prev_megamenu">Prev</a> | <a href="#" class="next_megamenu">Next</a>
+	       						</div>
+	       					</div>';
+	       	}else{
+	       		$output .= '<div class=" row_next_prev hidden-xs"></div>';
+	       	}
        	}
-       	$output .= $indent . '<li id=" menu-item-'. $item->ID . '"' . $value . $class_names .'>';
-
+       	
        	$atts = array();
-
+       	// print_r($item);
 	   	$atts['title']  = ! empty( $item->attr_title ) ? $item->attr_title : '';
 	   	$atts['target'] = ! empty( $item->target )     ? $item->target     : '';
 	   	$atts['rel']    = ! empty( $item->xfn )        ? $item->xfn        : '';
@@ -56,6 +66,7 @@ class md_walker extends Walker_Nav_Menu {
        	$atts = apply_filters( 'nav_menu_link_attributes', $atts, $item, $args );
 
        	$attributes = '';
+       	// print_r($atts);
         foreach ( $atts as $attr => $value ) {
             if ( ! empty( $value ) ) {
                 $value = ( 'href' === $attr ) ? esc_url( $value ) : esc_attr( $value );
@@ -64,11 +75,10 @@ class md_walker extends Walker_Nav_Menu {
         }
 
         $item_output = $args->before;
-        // // print_r($args);
-        // echo($item->is_mega_menu);
-        if($item->is_mega_menu == false){
+
+        if($item->is_mega_menu == ''){
         	$item_output .= '<a'. $attributes .'> ';
-        }
+        }	
 
         // $item_output .= $args->link_before .$prepend.apply_filters( 'the_title', $item->title, $item->ID ).$append;
         
@@ -81,21 +91,12 @@ class md_walker extends Walker_Nav_Menu {
                             FROM wp_postmeta
                             WHERE meta_key='_menu_item_menu_item_parent'
                             AND meta_value='".$item->ID."'");
-        if($depth == 0 && $has_children > 0){
-        	$item_output .= '&nbsp;<span class="caret '.$item->is_mega_menu.'"></span>';
+
+        if(($depth == 0 && $has_children > 0)){
+        	$item_output .= '&nbsp;<span class="caret megamenu-'.$item->is_mega_menu.' depth-'.$depth.' child-'.$has_children.'"></span>';
         }
        
-
-		if($item->is_mega_menu == true){
-			$item_output .= '&nbsp;<span class="caret '.$item->is_mega_menu.'"></span>';
-		}
-
-        /*if($depth == 0 && ($item->is_mega_menu == true)){
-        	$item_output .= '&nbsp;<span class="caret '.$item->is_mega_menu.'"></span>';
-        }*/
-
-        if ($item->is_mega_menu == false) {
-            // $item_output .= '&nbsp;<span class="caret '.$item->is_mega_menu.'"></span></a>';
+        if ($item->is_mega_menu == '') {
             $item_output .= '</a>';
         }
 
