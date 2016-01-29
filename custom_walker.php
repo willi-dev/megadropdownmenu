@@ -44,18 +44,6 @@ class md_walker extends Walker_Nav_Menu {
        	$id = $id ? ' id="' . esc_attr( $id ) . '"' : '';
 
        	$output .= $indent . '<li id="menu-item-'. $item->ID . '"' . $value . $class_names .'>';
-
-       	if($item->is_mega_menu == '1'){
-       		if($item->found_posts > 4){
-	       		$output .= '<div class=" row_next_prev hidden-xs">
-	       						<div class="" style="">
-	       							<a href="#" class="prev_megamenu">Prev</a> | <a href="#" class="next_megamenu">Next</a>
-	       						</div>
-	       					</div>';
-	       	}else{
-	       		$output .= '<div class=" row_next_prev hidden-xs"></div>';
-	       	}
-       	}
        	
        	$atts = array();
        	// print_r($item);
@@ -79,7 +67,6 @@ class md_walker extends Walker_Nav_Menu {
         if($item->is_mega_menu == ''){
         	$item_output .= '<a'. $attributes .'> ';
         }	
-
         // $item_output .= $args->link_before .$prepend.apply_filters( 'the_title', $item->title, $item->ID ).$append;
         
          /** This filter is documented in wp-includes/post-template.php */
@@ -101,6 +88,20 @@ class md_walker extends Walker_Nav_Menu {
         }
 
         $item_output .= $args->after;
+
+       	if($item->is_mega_menu == '1'){
+       		if($item->found_posts > 4){
+       			$style = ($item->current_page == '1') ? 'pointer-events: none; cursor: default;' : '';
+	       		$output .= '<div class="row_next_prev hidden-xs">
+	       						<div class="" style="">
+	       							<a href="#" style="'.$style.'" data-cat="'.$item->cat_id.'" id="prev-'.$item->cat_id.'" class="prev_megamenu">Prev</a> | 
+	       							<a href="#" data-cat="'.$item->cat_id.'" id="next-'.$item->cat_id.'" class="next_megamenu">Next</a>
+	       						</div>
+	       					</div>';
+	       	}else{
+	       		$output .= '<div class="row_next_prev hidden-xs"></div>';
+	       	}
+       	}
 
         $output .= apply_filters( 'walker_nav_menu_start_el', $item_output, $item, $depth, $args );
     }
