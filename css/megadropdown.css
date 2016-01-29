@@ -78,7 +78,7 @@ ul.megadropdown li.is_megamenu:hover .dropdown-menu{
 }
 .row_next_prev{
 	height:30px;
-	margin: 0 10px;
+	padding: 4px 30px 0px 30px;
 	
 }
 
