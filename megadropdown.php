@@ -10,10 +10,12 @@ Contributors: -
 Text Domain: -
 Domain Path: languages
 */
-
 class megadropdown {
 	var $is_mobile = true; // if mobile
 
+	var $current_page = 1; // Default page number
+	var $found_posts; // found_posts
+	var $total_pages; // total_pages
 	/**
 	 * Constructor
 	 */
@@ -39,11 +41,75 @@ class megadropdown {
 		add_action('wp_enqueue_scripts', array( $this, 'load_script'));
 
 		add_action( 'wp_ajax_nopriv_MyAjaxFunction', array($this, 'MyAjaxFunction') );
-   		add_action( 'wp_ajax_MyAjaxFunction', array($this, 'MyAjaxFunction') );
+  		add_action( 'wp_ajax_MyAjaxFunction', array($this, 'MyAjaxFunction') );
 
-   		
+   		add_action( 'wp_ajax_nopriv_getNextPage', array($this, 'getNextPage') );
+   		add_action( 'wp_ajax_getNextPage', array($this, 'getNextPage') );
+
+   		add_action( 'wp_ajax_nopriv_getPrevPage', array($this, 'getPrevPage') );
+   		add_action( 'wp_ajax_getPrevPage', array($this, 'getPrevPage') );
 	}
 	// end of constructor 
+
+	/**
+	 * set_page
+	 * function to set page number
+	 * @param $pagenumber
+	 * @return - 
+	 */
+	function set_current_page($pagenumber){
+		$this->current_page = $pagenumber;
+	}
+
+	/**
+	 * get_page
+	 * function to get page number
+	 * @param -
+	 * @return $this->page
+	 */
+	function get_current_page(){
+		return $this->current_page;
+	}
+
+	/**
+	 * set_found_posts
+	 * set found_posts 
+	 * @param $found
+	 * @return -
+	 */
+	function set_found_posts($found){
+		$this->found_posts = $found;
+	}
+
+	/**
+	 * get_found_posts
+	 * get found_posts number
+	 * @param - 
+	 * @return $found_posts
+	 */
+	function get_found_posts(){
+		return $this->found_posts;
+	}
+
+	/**
+	 * set_total_pages
+	 * set total page from [max_number_pages]
+	 * @param $total
+	 * @return -
+	 */
+	function set_total_pages($total){
+		$this->total_pages = $total;
+	}
+
+	/**
+	 * get_total_pages()
+	 * get total pages value
+	 * @param -
+	 * @return $total_pages
+	 */
+	function get_total_pages(){
+		return $this->total_pages;
+	}
 
     /**
      * register nav menu
@@ -78,7 +144,7 @@ class megadropdown {
 		// wp_register_script('megamenu-js', plugins_url('megadropdownmenu/js/megamenuscript.js'));
 		// wp_enqueue_script('megamenu-js');
 		wp_enqueue_script('megamenu-js', plugins_url('megadropdownmenu/js/megamenuscript.js') , array('jquery'), '1.0', true );
-		wp_localize_script( 'megamenu-js', 'the_ajax_script', array( 'ajaxurl' => admin_url( 'admin-ajax.php' ) ) );
+		wp_localize_script( 'megamenu-js', 'ajax_script', array( 'ajaxurl' => admin_url( 'admin-ajax.php' ) ) );
 	}
 
 	/*
@@ -121,8 +187,11 @@ class megadropdown {
 	function md_nav_menu_object($items, $args = '') {
 		$items_buff = array();
 		$category_key_post_meta = 'megadropdown_menu_cat';
-		
-		$found_posts = '';
+		$posts_per_page = 4; // OR limit
+
+		// $offset = ($this->get_page() - 1) * $posts_per_page; 
+		$offset = ($this->get_current_page() * $posts_per_page) - $posts_per_page;
+
 		// print_r($items);
 		foreach ($items as &$item) {
 			$item->is_mega_menu = false;
@@ -136,34 +205,46 @@ class megadropdown {
 				$items_buff[] = $item;
 
 				// generate wp post
-				$new_item = $this->generate_post();
+				$new_item = $this->generate_post(); // generate menu item
 				$new_item->is_mega_menu = true;
 				$new_item->menu_item_parent = $item->ID;
 				$new_item->cat_id = $megadropdown_menu_cat; // category id
 				$new_item->url = '';
-				$new_item->title = '<div class="block_megamenu">'; // open tag for mega menu
+
+				$new_item->title = '<div class="block_megamenu">'; // open tag for megamenu
+				$new_item->title .= '<div class="block_inner_megamenu">'; // open tag for inner megamenu
+
 				// query post by category
-				$querypostbyCat = new WP_Query(
-							array( 
-									'cat' => $megadropdown_menu_cat,
-									'posts_per_page' => 4
-								)
-						);
+				$querypostbyCat = $this->get_posts_by_cat($megadropdown_menu_cat, $posts_per_page, $offset);
 
-				$new_item->found_posts = $querypostbyCat->found_posts;
+				// set found_posts
+				$this->set_found_posts($querypostbyCat->found_posts);
+				// set and passing found_posts to $new_item
+				$new_item->found_posts = $this->get_found_posts();
+				$this->set_total_pages($querypostbyCat->max_num_pages);
+
+				$new_item->current_page = $this->get_current_page();
+
+				$new_item->offset = $offset;
+
+				$new_item->title .= '<input type="hidden" name="total_pages" value="'. $this->get_total_pages() .'" class="total_pages-'.$megadropdown_menu_cat.'">';
+				$new_item->title .= '<input type="hidden" name="found_posts" value="'. $this->get_found_posts() .'" class="found_posts-'.$megadropdown_menu_cat.'">';
+				$new_item->title .= '<input type="hidden" name="posts_per_page" value="'. $posts_per_page.'" class="posts_per_page-'.$megadropdown_menu_cat.'">';
+
 				// render result query
-				$new_item->title .= $this->render_inner($querypostbyCat->posts/*$found_posts*/);
+				$new_item->title .= $this->render_inner($querypostbyCat->posts /*$found_posts*/);
 
-				$new_item->title .= '</div>'; // close tag for mega menu
+				$new_item->title .= '</div>'; // close tag for inner megamenu
+				$new_item->title .= '</div>'; // close tag for megamenu
 				
 				$items_buff[] = $new_item;
+				// print_r($querypostbyCat);
 			}else{
 
 				$item->classes[] = 'md_menuitem';
 				$item->classes[] = 'dropdown is_not_megamenu';
 
 				$items_buff[] = $item;
-
 				// print_r($item);
 			}
 		}
@@ -172,6 +253,38 @@ class megadropdown {
 		// print_r($items_buff);
 		return $items_buff;
 	}
+
+	/**
+	 * get_posts_by_cat
+	 * @param $cat
+	 * @param $posts_per_page
+	 * @param $offset
+	 * @return WP_Query Object
+	 */
+	function get_posts_by_cat($cat, $posts_per_page, $offset){
+		$params = array(
+				'cat' => $cat,
+				'posts_per_page' => $posts_per_page,
+				'offset' => $offset
+			);
+		return new WP_Query($params);
+	}
+
+	/**
+	 * get_offset
+	 * get offset for pagination
+	 * @param $posts_per_page
+	 * @param $found_posts
+	 * @return
+	 */
+	// function get_offset($posts_per_page, $found_posts){
+	// 	$mod_page = $found_posts % $posts_per_page;
+	// 	if($mod_page != 0){
+
+	// 	}else{
+
+	// 	}
+	// }
 
 	/**
 	 * generate_post
@@ -247,7 +360,37 @@ class megadropdown {
     	return $url = esc_url(get_permalink($post->ID));
     }
 
-    // function 
+    /**
+     * getNextPage
+     * @param -
+   	 * @return -
+     */
+	function getNextPage(){
+		$total_pages = $_POST['total_pages'];
+		$found_posts = $_POST['found_posts'];
+		$posts_per_page = $_POST['posts_per_page'];
+		$results = "Next Click-> total_pages ".$total_pages.", found_posts ".$found_posts.", posts_per_page ".$posts_per_page;
+		die($results);
+	}
+
+	/**
+	 * getPrevPage
+	 * @param - 
+	 * @return -
+	 */
+	function getPrevPage(){
+		$total_pages = $_POST['total_pages'];
+		$found_posts = $_POST['found_posts'];
+		$posts_per_page = $_POST['posts_per_page'];
+		// $results = "Prev Click-> total_pages ".$total_pages.", found_posts ".$found_posts.", posts_per_page ".$posts_per_page;
+		$array_results = array(
+				'total_pages' => $total_pages,
+				'found_posts' => $found_posts,
+				'posts_per_page' => $posts_per_page
+			);
+		$results = json_encode($array_results);
+		die($results);
+	}
 
 	function MyAjaxFunction(){
 		//get the data from ajax() call
@@ -267,5 +410,3 @@ include_once('custom_walker.php');
 
 // add custom field to admin menu panel
 include_once('edit_custom_walker.php');
-
-
