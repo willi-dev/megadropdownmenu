@@ -91,7 +91,7 @@ class md_walker extends Walker_Nav_Menu {
 
        	if($item->is_mega_menu == '1'){
        		if($item->found_posts > 4){
-       			$style = ($item->current_page == '1') ? 'pointer-events: none; cursor: default;' : '';
+       			$style = ($item->current_page == '1') ? 'pointer-events: none; cursor: default; color: #ccc' : '';
 	       		$output .= '<div class="row_next_prev hidden-xs">
 	       						<div class="" style="">
 	       							<a href="#" style="'.$style.'" data-cat="'.$item->cat_id.'" id="prev-'.$item->cat_id.'" class="prev_megamenu">Prev</a> | 
