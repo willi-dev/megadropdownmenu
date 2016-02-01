@@ -40,9 +40,6 @@ class megadropdown {
 		// add action for script js
 		add_action('wp_enqueue_scripts', array( $this, 'load_script'));
 
-		add_action( 'wp_ajax_nopriv_MyAjaxFunction', array($this, 'MyAjaxFunction') );
-  		add_action( 'wp_ajax_MyAjaxFunction', array($this, 'MyAjaxFunction') );
-
    		add_action( 'wp_ajax_nopriv_getNextPage', array($this, 'getNextPage') );
    		add_action( 'wp_ajax_getNextPage', array($this, 'getNextPage') );
 
@@ -214,8 +211,11 @@ class megadropdown {
 				$new_item->no_item = $no_item;
 				$new_item->url = '';
 
-				$new_item->title = '<div class="block_megamenu block_megamenu-'.esc_attr( $megadropdown_menu_cat ).'-'.esc_attr( $no_item ).'">'; // open tag for megamenu
-				$new_item->title .= '<div class="block_inner_megamenu block_inner_megamenu-'.esc_attr( $megadropdown_menu_cat ).'-'.esc_attr( $no_item ).'">'; // open tag for inner megamenu
+				// open tag for megamenu
+				$new_item->title = '<div class="block_megamenu block_megamenu-'.esc_attr( $megadropdown_menu_cat ).'-'.esc_attr( $no_item ).'">'; 
+				$new_item->title .= '<div class="loading loading-'.esc_attr( $megadropdown_menu_cat ).'-'.esc_attr( $no_item ).'">LOADING</div>';
+				// open tag for inner megamenu
+				$new_item->title .= '<div class="block_inner_megamenu block_inner_megamenu-'.esc_attr( $megadropdown_menu_cat ).'-'.esc_attr( $no_item ).'">'; 
 
 				// query post by category
 				$querypostbyCat = $this->get_posts_by_cat($megadropdown_menu_cat, $posts_per_page, $offset);
@@ -233,11 +233,11 @@ class megadropdown {
 
 				$new_item->title .= '<input type="hidden" name="category_id-'.esc_attr( $no_item ).'" value="'. esc_attr( $megadropdown_menu_cat ) .'" class="category_id-'.esc_attr( $no_item ).'">';
 				$new_item->title .= '<input type="hidden" name="total_pages-'.esc_attr( $no_item ).'" value="'. esc_attr( $this->get_total_pages() ) .'" class="total_pages-'.esc_attr( $no_item ).'">';
-				$new_item->title .= '<input type="hidden" name="found_posts-'.esc_attr( $no_item ).'" value="'. esc_attr( $this->get_found_posts() ) .'" class="found_posts-'.esc_attr( $no_item ).'">';
+				// $new_item->title .= '<input type="hidden" name="found_posts-'.esc_attr( $no_item ).'" value="'. esc_attr( $this->get_found_posts() ) .'" class="found_posts-'.esc_attr( $no_item ).'">';
 				$new_item->title .= '<input type="hidden" name="posts_per_page-'.esc_attr( $no_item ).'" value="'. esc_attr( $posts_per_page ) .'" class="posts_per_page-'.esc_attr( $no_item ).'">';
 				$new_item->title .= '<input type="hidden" name="current_page-'.esc_attr( $no_item ).'" value="'. esc_attr( $this->get_current_page() ) .'" class="current_page-'.esc_attr( $no_item ).'">';
 				// render result query
-				$new_item->title .= $this->render_inner($querypostbyCat->posts, $megadropdown_menu_cat, $no_item /*$found_posts*/);
+				$new_item->title .= $this->render_inner($querypostbyCat->posts, $megadropdown_menu_cat, $no_item);
 
 				$new_item->title .= '</div>'; // close tag for inner megamenu
 				$new_item->title .= '</div>'; // close tag for megamenu
@@ -250,6 +250,7 @@ class megadropdown {
 				$item->classes[] = 'dropdown is_not_megamenu';
 
 				$items_buff[] = $item;
+
 				// print_r($item);
 			}
 			$no_item++;
@@ -280,7 +281,7 @@ class megadropdown {
 	 * get_offset
 	 * get offset for pagination
 	 * @param $posts_per_page
-	 * @param $found_posts
+	 * @param $current_page
 	 * ($this->get_current_page() * $posts_per_page) - $posts_per_page;
 	 * @return
 	 */
@@ -318,10 +319,10 @@ class megadropdown {
       * @param $posts
       * @return div megamenu 
       */
-    function render_inner($posts, $cat_id, $no_item /*$found_posts*/){
+    function render_inner($posts, $cat_id, $no_item){
     	$buff = '';
     	if(!empty($posts)) {
-    		$buff .= '<div class="row row-'.$cat_id.'-'.$no_item.'">';
+    		$buff .= '<div class="row row-'.esc_attr($cat_id).'-'.esc_attr($no_item).'">';
     		// $buff .= '<div class="'. $found_post .'"><a href="#">Prev</a> | <a href="#">Next</a></div>';
     		// print_r($found_post);
     		foreach ($posts as $post) {
@@ -372,11 +373,12 @@ class megadropdown {
     	$no_item = $args['no_item'];
     	$cat_id = $args['category_id'];
     	$total_pages = $args['total_pages'];
-    	$found_posts = $args['found_posts'];
+    	// $found_posts = $args['found_posts'];
     	$posts_per_page = $args['posts_per_page'];
     	$before_page = $args['current_page'];
     	$type = $args['type'];
-    	// $current_page = $args['current_page'];
+
+    	// type 'next'
     	if($type == 'next'){
     		if($before_page == '1' ){
 	    		$current_page = $before_page + 1;
@@ -388,11 +390,8 @@ class megadropdown {
 	    		}
 	    	}
     	}else{
-    		// if($before_page == $total_pages){
-    			$current_page = $before_page - 1;
-    		// }else{
-    			// if($before_page )
-    		// }
+    		// type 'prev'
+    		$current_page = $before_page - 1;
     	}
     	
     	$offset = $this->get_offset($current_page, $posts_per_page);
@@ -403,21 +402,23 @@ class megadropdown {
     		$new_posts = '<div class="block_inner_megamenu-'.esc_attr( $cat_id ).'-'.esc_attr( $no_item ).'">';
     		$new_posts .= '<input type="hidden" name="category_id-'.esc_attr( $no_item ).'" value="'. esc_attr( $cat_id ) .'" class="category_id-'.esc_attr( $no_item ).'">';
 			$new_posts .= '<input type="hidden" name="total_pages-'.esc_attr( $no_item ).'" value="'. esc_attr( $total_pages ) .'" class="total_pages-'.esc_attr( $no_item ).'">';
-			$new_posts .= '<input type="hidden" name="found_posts-'.esc_attr( $no_item ).'" value="'. esc_attr( $found_posts ) .'" class="found_posts-'.esc_attr( $no_item ).'">';
+			// $new_posts .= '<input type="hidden" name="found_posts-'.esc_attr( $no_item ).'" value="'. esc_attr( $found_posts ) .'" class="found_posts-'.esc_attr( $no_item ).'">';
 			$new_posts .= '<input type="hidden" name="posts_per_page-'.esc_attr( $no_item ).'" value="'. esc_attr( $posts_per_page ) .'" class="posts_per_page-'.esc_attr( $no_item ).'">';
 			$new_posts .= '<input type="hidden" name="current_page-'.esc_attr( $no_item ).'" value="'. esc_attr( $current_page ) .'" class="current_page-'.esc_attr( $no_item ).'">';
     		
-    		$new_posts .= $this->render_inner($query->posts, $cat_id, $no_item /*$found_posts*/);
-
+    		$new_posts .= $this->render_inner($query->posts, $cat_id, $no_item);
     		$new_posts .= '</div>';
+    		// $new_posts .= json_encode($this->render_inner($query->posts, $cat_id, $no_item));
+
     	} else {
     		$new_posts = '<div class="block_inner_megamenu-'.esc_attr( $cat_id ).'-'.esc_attr( $no_item ).'">';
     		$new_posts .= 'category: '.$cat_id;
     		$new_posts .= 'posts_per_page: '. $posts_per_page;
     		$new_posts .= 'offset: '.$offset;
     		$new_posts .= 'current page: '.$current_page;
-    		$new_posts .= json_encode($query->posts);
     		$new_posts .= '</div>';
+    		
+    		$new_posts .= json_encode($query->posts);
     	}
     	return $new_posts;
     }
@@ -431,7 +432,7 @@ class megadropdown {
 		$no_item = $_POST['no_item'];
 		$category_id = $_POST['category_id'];
 		$total_pages = $_POST['total_pages'];
-		$found_posts = $_POST['found_posts'];
+		// $found_posts = $_POST['found_posts'];
 		$posts_per_page = $_POST['posts_per_page'];
 		$current_page = $_POST['current_page'];
 		$type = $_POST['type'];
@@ -440,15 +441,13 @@ class megadropdown {
 			'no_item' => $no_item,
 			'category_id' => $category_id,
 			'total_pages' => $total_pages,
-			'found_posts' => $found_posts,
+			// 'found_posts' => $found_posts,
 			'posts_per_page' => $posts_per_page,
 			'current_page' => $current_page,
 			'type' => $type
 			);
 
 		$results = $this->generate_nextprev_posts( $params );
-
-		// $results = "Next Click-> total_pages ".$total_pages.", found_posts ".$found_posts.", posts_per_page ".$posts_per_page;
 		die($results);
 	}
 
@@ -461,7 +460,7 @@ class megadropdown {
 		$no_item = $_POST['no_item'];
 		$category_id = $_POST['category_id'];
 		$total_pages = $_POST['total_pages'];
-		$found_posts = $_POST['found_posts'];
+		// $found_posts = $_POST['found_posts'];
 		$posts_per_page = $_POST['posts_per_page'];
 		$current_page = $_POST['current_page'];
 		$type = $_POST['type'];
@@ -470,21 +469,13 @@ class megadropdown {
 			'no_item' => $no_item,
 			'category_id' => $category_id,
 			'total_pages' => $total_pages,
-			'found_posts' => $found_posts,
+			// 'found_posts' => $found_posts,
 			'posts_per_page' => $posts_per_page,
 			'current_page' => $current_page,
 			'type' => $type
 			);
 
 		$results = $this->generate_nextprev_posts( $params );
-		die($results);
-	}
-
-	function MyAjaxFunction(){
-		//get the data from ajax() call
-		$GreetingAll = $_POST['GreetingAll'];
-		$results = "<h2>".$GreetingAll."</h2>";
-		// Return the String
 		die($results);
 	}
 
