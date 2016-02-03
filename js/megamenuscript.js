@@ -91,12 +91,16 @@ jQuery(document).ready(function() {
                             type: 'next'
                         },
                         beforeSend: function(){
+                            jQuery("#next-"+categoryId+"-"+noItem).css("pointer-events", 'none');
+                            jQuery("#next-"+categoryId+"-"+noItem).css("cursor", 'default');
+                            jQuery("#next-"+categoryId+"-"+noItem).css("color", '#ccc');
                             // tmpInnerData[currentPage] = jQuery(".block_megamenu-"+categoryId+"-"+noItem).html();
                             // console.log("next ["+outerIndex+"] fill tmpInnerData["+currentPage+"]");
                             jQuery(".block_inner_megamenu-"+categoryId+"-"+noItem).fadeOut().remove();
                             jQuery(".loading-"+categoryId+"-"+noItem).show();
                         },
                         success: function(data){
+                            jQuery("#next-"+categoryId+"-"+noItem).removeAttr( "style" );
                             jQuery('.loading-'+categoryId+"-"+noItem).hide(function(){
                                 // remove style in prev link
                                 jQuery("#prev-"+categoryId+"-"+noItem).removeAttr( "style" );
@@ -149,12 +153,16 @@ jQuery(document).ready(function() {
                         type: 'next'
                     },
                     beforeSend: function(){
+                        jQuery("#next-"+categoryId+"-"+noItem).css("pointer-events", 'none');
+                        jQuery("#next-"+categoryId+"-"+noItem).css("cursor", 'default');
+                        jQuery("#next-"+categoryId+"-"+noItem).css("color", '#ccc');
                         // tmpInnerData[currentPage] = jQuery(".block_megamenu-"+categoryId+"-"+noItem).html();
                         // console.log("next ["+outerIndex+"] fill tmpInnerData["+currentPage+"]");
                         jQuery(".block_inner_megamenu-"+categoryId+"-"+noItem).fadeOut().remove();
                         jQuery(".loading-"+categoryId+"-"+noItem).show();
                     },
                     success: function(data){
+                        jQuery("#next-"+categoryId+"-"+noItem).removeAttr( "style" );
                         jQuery('.loading-'+categoryId+"-"+noItem).hide(function(){
                             // remove style in prev link
                             jQuery("#prev-"+categoryId+"-"+noItem).removeAttr( "style" );
