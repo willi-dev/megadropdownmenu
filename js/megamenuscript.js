@@ -295,12 +295,18 @@ jQuery(document).ready(function() {
                     jQuery(".block_megamenu-"+categoryId+"-"+noItem).prepend(tmpData[outerIndex][prevIndex]).fadeIn('slow', function(){
                         cPage = jQuery(".current_page-"+categoryId+"-"+noItem).val();
                         tPages = jQuery(".total_pages-"+categoryId+"-"+noItem).val();
-                        if(cPage == '1'){
-                            jQuery("#prev-"+categoryId+"-"+noItem).css("pointer-events", 'none');
-                            jQuery("#prev-"+categoryId+"-"+noItem).css("cursor", 'default');
-                            jQuery("#prev-"+categoryId+"-"+noItem).css("color", '#ccc');
-                            // remove style in prev link
-                            jQuery("#next-"+categoryId+"-"+noItem).removeAttr( "style" );
+                        if(cPage < tPages){
+
+                            if(cPage == '1'){
+                                jQuery("#prev-"+categoryId+"-"+noItem).css("pointer-events", 'none');
+                                jQuery("#prev-"+categoryId+"-"+noItem).css("cursor", 'default');
+                                jQuery("#prev-"+categoryId+"-"+noItem).css("color", '#ccc');
+                                // remove style in prev link
+                                jQuery("#next-"+categoryId+"-"+noItem).removeAttr( "style" );
+                            }else{
+                                jQuery("#next-"+categoryId+"-"+noItem).removeAttr( "style" );
+                                jQuery("#prev-"+categoryId+"-"+noItem).removeAttr( "style" );
+                            } 
                         }
                     });
                 }
