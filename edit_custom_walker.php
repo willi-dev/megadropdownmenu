@@ -15,8 +15,8 @@ class Walker_Nav_Menu_Edit_Custom extends Walker_Nav_Menu {
 	 *
 	 * @param string $output Passed by reference.
 	 */
-	/*function start_lvl(&$output,  $depth = 0, $args= array()) {	
-	}*/
+	function start_lvl(&$output,  $depth = 0, $args= array()) {	
+	}
 	
 	/**
 	 * @see Walker_Nav_Menu::end_lvl()
@@ -24,8 +24,8 @@ class Walker_Nav_Menu_Edit_Custom extends Walker_Nav_Menu {
 	 *
 	 * @param string $output Passed by reference.
 	 */
-	/*function end_lvl(&$output,  $depth = 0, $args= array()) {
-	}*/
+	function end_lvl(&$output,  $depth = 0, $args= array()) {
+	}
 	
 	/**
 	 * @see Walker::start_el()
@@ -38,9 +38,7 @@ class Walker_Nav_Menu_Edit_Custom extends Walker_Nav_Menu {
 	 */
 	
 	function start_el(&$output, $item, $depth = 0, $args = array(), $id = 0) {
-		
 		global $_wp_nav_menu_max_depth;
-	   
 	    $_wp_nav_menu_max_depth = $depth > $_wp_nav_menu_max_depth ? $depth : $_wp_nav_menu_max_depth;
 	
 	    $indent = ( $depth ) ? str_repeat( "\t", $depth ) : '';
@@ -85,12 +83,16 @@ class Walker_Nav_Menu_Edit_Custom extends Walker_Nav_Menu {
 	    }
 	
 	    $title = empty( $item->label ) ? $title : $item->label;
-	
+		
+		$submenu_text = '';
+		if ( 0 == $depth )
+			$submenu_text = 'style="display: none;"';
+
 	    ?>
 	    <li id="menu-item-<?php echo $item_id; ?>" class="<?php echo implode(' ', $classes ); ?>">
 	        <dl class="menu-item-bar">
 	            <dt class="menu-item-handle">
-	                <span class="item-title"><?php echo esc_html( $title ); ?></span>
+	                <span class="item-title"><?php echo esc_html( $title ); ?> <span class="is-submenu" <?php echo $submenu_text; ?>><?php _e( 'sub item' ); ?></span></span>
 	                <span class="item-controls">
 	                    <span class="item-type"><?php echo esc_html( $item->type_label ); ?></span>
 	                    <span class="item-order hide-if-js">
@@ -225,6 +227,7 @@ class Walker_Nav_Menu_Edit_Custom extends Walker_Nav_Menu {
 	            <input class="menu-item-data-position" type="hidden" name="menu-item-position[<?php echo $item_id; ?>]" value="<?php echo esc_attr( $item->menu_order ); ?>" />
 	            <input class="menu-item-data-type" type="hidden" name="menu-item-type[<?php echo $item_id; ?>]" value="<?php echo esc_attr( $item->type ); ?>" />
 	        </div><!-- .menu-item-settings-->
+
 	        <ul class="menu-item-transport"></ul>
 	    <?php
 	    
