@@ -73,7 +73,7 @@ class md_walker extends Walker_Nav_Menu {
         $item_output .= $args->link_before . apply_filters( 'the_title', $item->title, $item->ID ) . $args->link_after;
 
         // $item_output .= $description.$args->link_after;
-
+        // wp prepare ..
         $has_children = $wpdb->get_var("SELECT COUNT(meta_id)
                             FROM wp_postmeta
                             WHERE meta_key='_menu_item_menu_item_parent'
@@ -94,8 +94,8 @@ class md_walker extends Walker_Nav_Menu {
        			$stylefirst = ($item->current_page == '1') ? 'pointer-events: none; cursor: default; color: #ccc' : '';
 	       		$output .= '<div class="row_next_prev hidden-xs row_next_prev-'.$item->cat_id.'-'.$item->no_item.'">
 	       						<div class="" style="">
-	       							<a href="#" style="'.$stylefirst.'" data-item="'.$item->no_item.'" id="prev-'.$item->cat_id.'-'.$item->no_item.'" class="prev_megamenu">Prev</a> | 
-	       							<a href="#" style="" data-item="'.$item->no_item.'" id="next-'.$item->cat_id.'-'.$item->no_item.'" class="next_megamenu">Next</a>
+	       							<a href="#" style="'.$stylefirst.'" data-cat="'.$item->cat_id.'" data-item="'.$item->no_item.'" id="prev-'.$item->cat_id.'-'.$item->no_item.'" class="prev_megamenu">Prev</a> | 
+	       							<a href="#" style="" data-cat="'.$item->cat_id.'" data-item="'.$item->no_item.'" id="next-'.$item->cat_id.'-'.$item->no_item.'" class="next_megamenu">Next</a>
 	       						</div>
 	       					</div>';
 	       	}else{
