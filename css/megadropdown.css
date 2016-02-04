@@ -47,7 +47,7 @@ ul.megadropdown li.is_megamenu:hover .dropdown-menu{
   left: auto;
 }
 #megadropdown .block_megamenu {
-  	padding: 20px 30px;
+  	padding: 20px 20px;
 }
 #megadropdown .list_megamenu, .dropdown-menu{
 	background: #F8F8F8;
@@ -80,5 +80,13 @@ ul.megadropdown li.is_megamenu:hover .dropdown-menu{
 	height:30px;
 	padding: 4px 30px 0px 30px;
 	
+}
+
+
+.megamenu-nav-sub > li.active{
+	background: #eee;
+}
+.megamenu-nav-sub > li a, .megamenu-nav-sub > li.active a{
+	color: #666;
 }
 
