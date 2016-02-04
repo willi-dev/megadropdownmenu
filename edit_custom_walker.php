@@ -178,27 +178,32 @@ class Walker_Nav_Menu_Edit_Custom extends Walker_Nav_Menu {
 
 	            <?php
 	            /* New fields (select category for megamenu) starts here */
-				$category_key_post_meta = 'megadropdown_menu_cat';
-				$megadropdown_menu_cat = get_post_meta($item->ID, $category_key_post_meta, true);
-				$cat_tree = array_merge(
-					array(' - not mega dropdown menu - ' => ''),
-					$this->get_category_array(false)
-				);
+	            if(0 == $depth){ // check if depth == 0
+	            	$category_key_post_meta = 'megadropdown_menu_cat';
+					$megadropdown_menu_cat = get_post_meta($item->ID, $category_key_post_meta, true);
+					$cat_tree = array_merge(
+						array(' - not mega dropdown menu - ' => ''),
+						$this->get_category_array(false)
+					);
 
-				?>
-				<p class="description description-wide">
-					<label>Category Mega Dropdown</label><br>
-						<select name="<?php echo esc_attr($category_key_post_meta);?>[<?php echo esc_attr($item->ID);?>]" id="" class="widefat code edit-menu-item-url">
-				<?php 
+					?>
+					<p class="description description-wide">
+						<label>Category Mega Dropdown</label><br>
+							<select name="<?php echo esc_attr($category_key_post_meta);?>[<?php echo esc_attr($item->ID);?>]" id="" class="widefat code edit-menu-item-url">
+					<?php 
 
-						foreach ($cat_tree as $category => $category_id) {
-				?>
-							<option value="<?php echo esc_attr($category_id);?>" <?php echo selected($megadropdown_menu_cat, $category_id, false);?>><?php echo $category;?></option>
-				<?php 
-						}
-				?>
-						</select>
-				</p>
+							foreach ($cat_tree as $category => $category_id) {
+					?>
+								<option value="<?php echo esc_attr($category_id);?>" <?php echo selected($megadropdown_menu_cat, $category_id, false);?>><?php echo $category;?></option>
+					<?php 
+							}
+
+					?>
+							</select>
+					</p>
+				<?php
+	            }
+	            ?>
 
 	            <div class="menu-item-actions description-wide submitbox">
 	                <?php if( 'custom' != $item->type && $original_title !== false ) : ?>
