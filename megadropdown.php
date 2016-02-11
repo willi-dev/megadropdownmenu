@@ -116,10 +116,10 @@ class megadropdown {
     	register_nav_menus(
     		array(
     			'theme_location' 	=> 'primary', 
-				'menu_id' 			=> 'primary-menu-megadropdown',
+				'menu_id' 			=> 'df-primary-megadropdown-menu',
     			'menu' 			=> 'main',  // md_walker class for megamenu
 				'walker' 		=> new md_walker, // md_walker for megamenu 
-				'menu_class' 	=> 'nav navbar-nav megadropdown'
+				'menu_class' 	=> 'nav navbar-nav df-megadropdown-menu'
     			)
     	);
     }
@@ -211,8 +211,8 @@ class megadropdown {
 				$sizeof = (sizeof($sub_cat) == 0) ? 'no sub' : 'has sub categories with post';
 				// print_r($sub_cat);
 
-				$item->classes[] = 'md_menuitem';
-				$item->classes[] = 'is_megamenu dropdown';
+				$item->classes[] = 'df-md-menuitem';
+				$item->classes[] = 'df-is-megamenu dropdown';
 
 				$buffer_items[] = $item;
 
@@ -225,7 +225,7 @@ class megadropdown {
 				$new_item->url = '';
 
 				// open tag for megamenu
-				$new_item->title = '<div class="block_megamenu block_megamenu-'.esc_attr( $megadropdown_menu_cat ).'-'.esc_attr( $no_item ).'">'; 
+				$new_item->title = '<div class="df-block-megamenu df-block-megamenu-'.esc_attr( $megadropdown_menu_cat ).'-'.esc_attr( $no_item ).'">'; 
 				$new_item->title .= '<div class="row">'; // open tag for row
 
 				$posts_per_page = (sizeof($sub_cat) == 0) ? 4 : 3;
@@ -236,9 +236,9 @@ class megadropdown {
 					$offset = $this->get_offset($this->get_current_page(), $posts_per_page);
 
 					// loading div container
-					$new_item->title .= '<div class="loading loading-'.esc_attr( $megadropdown_menu_cat ).'-'.esc_attr( $no_item ).'">LOADING</div>';
+					$new_item->title .= '<div class="df-loading df-loading-'.esc_attr( $megadropdown_menu_cat ).'-'.esc_attr( $no_item ).'">LOADING</div>';
 					// open tag for inner megamenu
-					$new_item->title .= '<div class="block_inner_megamenu block_inner_megamenu-'.esc_attr( $megadropdown_menu_cat ).'-'.esc_attr( $no_item ).'">'; 
+					$new_item->title .= '<div class="df-block-inner-megamenu df-block-inner-megamenu-'.esc_attr( $megadropdown_menu_cat ).'-'.esc_attr( $no_item ).'">'; 
 
 					// query post by category
 					$querypostbyCat = $this->get_posts_by_cat($megadropdown_menu_cat, $posts_per_page, $offset);
@@ -254,10 +254,10 @@ class megadropdown {
 
 					$new_item->offset = $offset;
 
-					$new_item->title .= '<input type="hidden" name="total_pages-'.esc_attr( $megadropdown_menu_cat ) .'-'. esc_attr( $no_item ) .'" value="'. esc_attr( $this->get_total_pages() ) .'" class="total_pages-'. esc_attr( $megadropdown_menu_cat ) .'-'. esc_attr( $no_item ) .'">';
-					$new_item->title .= '<input type="hidden" name="posts_per_page-'. esc_attr( $megadropdown_menu_cat ) .'-'. esc_attr( $no_item ) .'" value="'. esc_attr( $posts_per_page ) .'" class="posts_per_page-'. esc_attr( $megadropdown_menu_cat ) .'-'. esc_attr( $no_item ) .'">';
-					$new_item->title .= '<input type="hidden" name="current_page-'. esc_attr( $megadropdown_menu_cat ) .'-'. esc_attr( $no_item ) .'" value="'. esc_attr( $this->get_current_page() ) .'" class="current_page-'. esc_attr( $megadropdown_menu_cat ) .'-'. esc_attr( $no_item ) .'">';
-					$new_item->title .= '<input type="hidden" name="has_sub_cat-'. esc_attr( $megadropdown_menu_cat ) .'-'. esc_attr( $no_item ) .'" value="'. esc_attr( $has_sub_cat ) .'" class="has_sub_cat-'. esc_attr( $megadropdown_menu_cat ) .'-'. esc_attr( $no_item ) .'">';
+					$new_item->title .= '<input type="hidden" name="df-total-pages-'.esc_attr( $megadropdown_menu_cat ) .'-'. esc_attr( $no_item ) .'" value="'. esc_attr( $this->get_total_pages() ) .'" class="df-total-pages-'. esc_attr( $megadropdown_menu_cat ) .'-'. esc_attr( $no_item ) .'">';
+					$new_item->title .= '<input type="hidden" name="df-posts-per-page-'. esc_attr( $megadropdown_menu_cat ) .'-'. esc_attr( $no_item ) .'" value="'. esc_attr( $posts_per_page ) .'" class="df-posts-per-page-'. esc_attr( $megadropdown_menu_cat ) .'-'. esc_attr( $no_item ) .'">';
+					$new_item->title .= '<input type="hidden" name="df-current-page-'. esc_attr( $megadropdown_menu_cat ) .'-'. esc_attr( $no_item ) .'" value="'. esc_attr( $this->get_current_page() ) .'" class="df-current-page-'. esc_attr( $megadropdown_menu_cat ) .'-'. esc_attr( $no_item ) .'">';
+					$new_item->title .= '<input type="hidden" name="df-has-sub-cat-'. esc_attr( $megadropdown_menu_cat ) .'-'. esc_attr( $no_item ) .'" value="'. esc_attr( $has_sub_cat ) .'" class="df-has-sub-cat-'. esc_attr( $megadropdown_menu_cat ) .'-'. esc_attr( $no_item ) .'">';
 					
 					// render result query
 					$new_item->title .= $this->render_inner($querypostbyCat->posts, $megadropdown_menu_cat, $no_item, $has_sub_cat);
@@ -268,17 +268,17 @@ class megadropdown {
 					$has_sub_cat = 'true';
 
 					// loading div container
-					// $new_item->title .= '<div class="loading loading-'.esc_attr( $megadropdown_menu_cat ).'-'.esc_attr( $no_item ).'">LOADING</div>';
+					// $new_item->title .= '<div class="df-loading df-loading-'.esc_attr( $megadropdown_menu_cat ).'-'.esc_attr( $no_item ).'">LOADING</div>';
 
 					// load sub categories as navigation
 					$new_item->title .= '<div class="col-md-3">';
-					$new_item->title .= '<ul class="nav nav-stacked megamenu-nav-sub" id="megamenu-'.esc_attr( $megadropdown_menu_cat ).'-'.esc_attr( $no_item ).'">';
+					$new_item->title .= '<ul class="nav nav-stacked df-megamenu-nav-sub" id="megamenu-'.esc_attr( $megadropdown_menu_cat ).'-'.esc_attr( $no_item ).'">';
 					$new_item->title .= '<li class="active">';
-					$new_item->title .= '<a  data-toggle="tab" href="#pane-'.esc_attr( $megadropdown_menu_cat ).'-'.esc_attr( $no_item ).'">All</a>';
+					$new_item->title .= '<a  data-toggle="tab" href="#df-pane-'.esc_attr( $megadropdown_menu_cat ).'-'.esc_attr( $no_item ).'">All</a>';
 					$new_item->title .= '</li>';
 					foreach($sub_cat as $sc){
 						$new_item->title .= '<li class="">';
-							$new_item->title .= '<a data-toggle="tab" href="#pane-'.esc_attr( $sc->cat_ID ).'-'.esc_attr( $no_item ).'" class="">'.$sc->cat_name.'</a>';
+							$new_item->title .= '<a data-toggle="tab" href="#df-pane-'.esc_attr( $sc->cat_ID ).'-'.esc_attr( $no_item ).'" class="">'.$sc->cat_name.'</a>';
 						$new_item->title .= '</li>';
 					}
 					$new_item->title .= '</ul>';
@@ -293,11 +293,11 @@ class megadropdown {
 					
 
 					// load content posts here
-					$new_item->title .= '<div class="container_tab_content col-md-9">'; // open tag for col-md-9 (container of tab content)
+					$new_item->title .= '<div class="df-container-tab-content col-md-9">'; // open tag for col-md-9 (container of tab content)
 					$new_item->title .= '<div class="tab-content tab-content-'.esc_attr( $megadropdown_menu_cat ).'-'.esc_attr( $no_item ).'">'; // open tag for tab content
 
 					// open tag for tab-content_inner / pane
-					$new_item->title .= '<div id="pane-'.esc_attr( $megadropdown_menu_cat ).'-'.esc_attr( $no_item ).'" class="tab-pane fade active in tab-content_inner-'.esc_attr( $megadropdown_menu_cat ).'-'.esc_attr( $no_item ).'">'; 
+					$new_item->title .= '<div id="df-pane-'.esc_attr( $megadropdown_menu_cat ).'-'.esc_attr( $no_item ).'" class="tab-pane fade active in df-tab-content-inner-'.esc_attr( $megadropdown_menu_cat ).'-'.esc_attr( $no_item ).'">'; 
 
 					// set found_posts
 					$this->set_found_posts($querypostbyCat->found_posts);
@@ -319,13 +319,13 @@ class megadropdown {
 	           		$new_item->title .= '<div class="row-inner">';// open tag for row block inner megamenu
 
 					// loading div container
-					$new_item->title .= '<div class="loading loading-'.esc_attr( $megadropdown_menu_cat ).'-'.esc_attr( $no_item ).'">LOADING</div>';
+					$new_item->title .= '<div class="df-loading df-loading-'.esc_attr( $megadropdown_menu_cat ).'-'.esc_attr( $no_item ).'">LOADING</div>';
 					//  open tag for block inner megamenu
-					$new_item->title .= '<div class="block_inner_megamenu block_inner_megamenu-'.esc_attr( $megadropdown_menu_cat ).'-'.esc_attr( $no_item ).'">'; 
-					$new_item->title .= '<input type="hidden" name="total_pages-'.esc_attr( $megadropdown_menu_cat ) .'-'. esc_attr( $no_item ) .'" value="'. esc_attr( $this->get_total_pages() ) .'" class="total_pages-'. esc_attr( $megadropdown_menu_cat ) .'-'. esc_attr( $no_item ) .'">';
-					$new_item->title .= '<input type="hidden" name="posts_per_page-'. esc_attr( $megadropdown_menu_cat ) .'-'. esc_attr( $no_item ) .'" value="'. esc_attr( $posts_per_page ) .'" class="posts_per_page-'. esc_attr( $megadropdown_menu_cat ) .'-'. esc_attr( $no_item ) .'">';
-					$new_item->title .= '<input type="hidden" name="current_page-'. esc_attr( $megadropdown_menu_cat ) .'-'. esc_attr( $no_item ) .'" value="'. esc_attr( $this->get_current_page() ) .'" class="current_page-'. esc_attr( $megadropdown_menu_cat ) .'-'. esc_attr( $no_item ) .'">';
-					$new_item->title .= '<input type="hidden" name="has_sub_cat-'. esc_attr( $megadropdown_menu_cat ) .'-'. esc_attr( $no_item ) .'" value="'. esc_attr( $has_sub_cat ) .'" class="has_sub_cat-'. esc_attr( $megadropdown_menu_cat ) .'-'. esc_attr( $no_item ) .'">';
+					$new_item->title .= '<div class="df-block-inner-megamenu df-block-inner-megamenu-'.esc_attr( $megadropdown_menu_cat ).'-'.esc_attr( $no_item ).'">'; 
+					$new_item->title .= '<input type="hidden" name="df-total-pages-'.esc_attr( $megadropdown_menu_cat ) .'-'. esc_attr( $no_item ) .'" value="'. esc_attr( $this->get_total_pages() ) .'" class="df-total-pages-'. esc_attr( $megadropdown_menu_cat ) .'-'. esc_attr( $no_item ) .'">';
+					$new_item->title .= '<input type="hidden" name="df-posts-per-page-'. esc_attr( $megadropdown_menu_cat ) .'-'. esc_attr( $no_item ) .'" value="'. esc_attr( $posts_per_page ) .'" class="df-posts-per-page-'. esc_attr( $megadropdown_menu_cat ) .'-'. esc_attr( $no_item ) .'">';
+					$new_item->title .= '<input type="hidden" name="df-current-page-'. esc_attr( $megadropdown_menu_cat ) .'-'. esc_attr( $no_item ) .'" value="'. esc_attr( $this->get_current_page() ) .'" class="df-current-page-'. esc_attr( $megadropdown_menu_cat ) .'-'. esc_attr( $no_item ) .'">';
+					$new_item->title .= '<input type="hidden" name="df-has-sub-cat-'. esc_attr( $megadropdown_menu_cat ) .'-'. esc_attr( $no_item ) .'" value="'. esc_attr( $has_sub_cat ) .'" class="df-has-sub-cat-'. esc_attr( $megadropdown_menu_cat ) .'-'. esc_attr( $no_item ) .'">';
 					$new_item->title .= $this->render_inner($querypostbyCat->posts, $megadropdown_menu_cat, $no_item, 'true');
 					$new_item->title .= '</div>'; // close tag for block inner megamenu
 
@@ -336,7 +336,7 @@ class megadropdown {
 						// $new_item->title .= $countersc->cat_ID;
 
 
-						$new_item->title .= '<div id="pane-'.$countersc->cat_ID.'-'.$no_item.'" class="tab-pane fade tab-content_inner-'.$countersc->cat_ID.'-'.$no_item.'">'; // open tag for tab-content_inner
+						$new_item->title .= '<div id="df-pane-'.$countersc->cat_ID.'-'.$no_item.'" class="tab-pane fade df-tab-content-inner-'.$countersc->cat_ID.'-'.$no_item.'">'; // open tag for tab-content_inner
 						// query post by category
 						$querypostbyCat = $this->get_posts_by_cat($countersc->cat_ID, $posts_per_page, $offset);
 
@@ -358,13 +358,13 @@ class megadropdown {
 		           		}
 		           		$new_item->title .= '<div class="row-inner">';// open tag for row block inner megamenu
 						// open tag for inner megamenu
-						$new_item->title .= '<div class="loading loading-'.esc_attr( $countersc->cat_ID  ).'-'.esc_attr( $no_item ).'">LOADING</div>';
+						$new_item->title .= '<div class="df-loading df-loading-'.esc_attr( $countersc->cat_ID  ).'-'.esc_attr( $no_item ).'">LOADING</div>';
 
-						$new_item->title .= '<div class="block_inner_megamenu block_inner_megamenu-'.esc_attr( $countersc->cat_ID ).'-'.esc_attr( $no_item ).'">'; // open tag for block inner megamenu
-						$new_item->title .= '<input type="hidden" name="total_pages-'.esc_attr( $countersc->cat_ID ) .'-'. esc_attr( $no_item ) .'" value="'. esc_attr( $this->get_total_pages() ) .'" class="total_pages-'. esc_attr( $countersc->cat_ID ) .'-'. esc_attr( $no_item ) .'">';
-						$new_item->title .= '<input type="hidden" name="posts_per_page-'. esc_attr( $countersc->cat_ID ) .'-'. esc_attr( $no_item ) .'" value="'. esc_attr( $posts_per_page ) .'" class="posts_per_page-'. esc_attr( $countersc->cat_ID ) .'-'. esc_attr( $no_item ) .'">';
-						$new_item->title .= '<input type="hidden" name="current_page-'. esc_attr( $countersc->cat_ID ) .'-'. esc_attr( $no_item ) .'" value="'. esc_attr( $this->get_current_page() ) .'" class="current_page-'. esc_attr( $countersc->cat_ID ) .'-'. esc_attr( $no_item ) .'">';
-						$new_item->title .= '<input type="hidden" name="has_sub_cat-'. esc_attr( $countersc->cat_ID ) .'-'. esc_attr( $no_item ) .'" value="'. esc_attr( $has_sub_cat ) .'" class="has_sub_cat-'. esc_attr( $countersc->cat_ID ) .'-'. esc_attr( $no_item ) .'">';
+						$new_item->title .= '<div class="df-block-inner-megamenu df-block-inner-megamenu-'.esc_attr( $countersc->cat_ID ).'-'.esc_attr( $no_item ).'">'; // open tag for block inner megamenu
+						$new_item->title .= '<input type="hidden" name="df-total-pages-'.esc_attr( $countersc->cat_ID ) .'-'. esc_attr( $no_item ) .'" value="'. esc_attr( $this->get_total_pages() ) .'" class="df-total-pages-'. esc_attr( $countersc->cat_ID ) .'-'. esc_attr( $no_item ) .'">';
+						$new_item->title .= '<input type="hidden" name="df-posts-per-page-'. esc_attr( $countersc->cat_ID ) .'-'. esc_attr( $no_item ) .'" value="'. esc_attr( $posts_per_page ) .'" class="df-posts-per-page-'. esc_attr( $countersc->cat_ID ) .'-'. esc_attr( $no_item ) .'">';
+						$new_item->title .= '<input type="hidden" name="df-current-page-'. esc_attr( $countersc->cat_ID ) .'-'. esc_attr( $no_item ) .'" value="'. esc_attr( $this->get_current_page() ) .'" class="df-current-page-'. esc_attr( $countersc->cat_ID ) .'-'. esc_attr( $no_item ) .'">';
+						$new_item->title .= '<input type="hidden" name="df-has-sub-cat-'. esc_attr( $countersc->cat_ID ) .'-'. esc_attr( $no_item ) .'" value="'. esc_attr( $has_sub_cat ) .'" class="df-has-sub-cat-'. esc_attr( $countersc->cat_ID ) .'-'. esc_attr( $no_item ) .'">';
 						$new_item->title .= $this->render_inner($querypostbyCat->posts, $countersc->cat_ID, $no_item, $has_sub_cat);
 						$new_item->title .= '</div>'; // close tag for block inner megamenu
 
@@ -383,8 +383,8 @@ class megadropdown {
 				
 				$buffer_items[] = $new_item;
 			}else{
-				$item->classes[] = 'md_menuitem';
-				$item->classes[] = 'dropdown is_not_megamenu';
+				$item->classes[] = 'df-md-menuitem';
+				$item->classes[] = 'dropdown df-is-not-megamenu';
 				$buffer_items[] = $item;
 			}
 			$no_item++;
@@ -551,18 +551,18 @@ class megadropdown {
     	$query = $this->get_posts_by_cat($cat_id, $posts_per_page, $offset);
 
     	if( $query->have_posts() ){
-    		$new_posts = '<div class="block_inner_megamenu-'.esc_attr( $cat_id ).'-'.esc_attr( $no_item ).'">';
+    		$new_posts = '<div class="df-block-inner-megamenu-'.esc_attr( $cat_id ).'-'.esc_attr( $no_item ).'">';
 
-    		$new_posts .= '<input type="hidden" name="total_pages-'.esc_attr( $cat_id ) .'-'. esc_attr( $no_item ) .'" value="'. esc_attr( $total_pages ) .'" class="total_pages-'. esc_attr( $cat_id ) .'-'. esc_attr( $no_item ) .'">';
-			$new_posts .= '<input type="hidden" name="posts_per_page-'. esc_attr( $cat_id ) .'-'. esc_attr( $no_item ) .'" value="'. esc_attr( $posts_per_page ) .'" class="posts_per_page-'. esc_attr( $cat_id ) .'-'. esc_attr( $no_item ) .'">';
-			$new_posts .= '<input type="hidden" name="current_page-'. esc_attr( $cat_id ) .'-'. esc_attr( $no_item ) .'" value="'. esc_attr( $current_page ) .'" class="current_page-'. esc_attr( $cat_id ) .'-'. esc_attr( $no_item ) .'">';
-			$new_posts .= '<input type="hidden" name="has_sub_cat-'. esc_attr( $cat_id ) .'-'. esc_attr( $no_item ) .'" value="'. esc_attr( $has_sub_cat ) .'" class="has_sub_cat-'. esc_attr( $cat_id ) .'-'. esc_attr( $no_item ) .'">';
+    		$new_posts .= '<input type="hidden" name="df-total-pages-'.esc_attr( $cat_id ) .'-'. esc_attr( $no_item ) .'" value="'. esc_attr( $total_pages ) .'" class="df-total-pages-'. esc_attr( $cat_id ) .'-'. esc_attr( $no_item ) .'">';
+			$new_posts .= '<input type="hidden" name="df-posts-per-page-'. esc_attr( $cat_id ) .'-'. esc_attr( $no_item ) .'" value="'. esc_attr( $posts_per_page ) .'" class="df-posts-per-page-'. esc_attr( $cat_id ) .'-'. esc_attr( $no_item ) .'">';
+			$new_posts .= '<input type="hidden" name="df-current-page-'. esc_attr( $cat_id ) .'-'. esc_attr( $no_item ) .'" value="'. esc_attr( $current_page ) .'" class="df-current-page-'. esc_attr( $cat_id ) .'-'. esc_attr( $no_item ) .'">';
+			$new_posts .= '<input type="hidden" name="df-has-sub-cat-'. esc_attr( $cat_id ) .'-'. esc_attr( $no_item ) .'" value="'. esc_attr( $has_sub_cat ) .'" class="df-has-sub-cat-'. esc_attr( $cat_id ) .'-'. esc_attr( $no_item ) .'">';
 					
     		$new_posts .= $this->render_inner($query->posts, $cat_id, $no_item, $has_sub_cat);
     		$new_posts .= '</div>';
 
     	} else {
-    		$new_posts = '<div class="block_inner_megamenu-'.esc_attr( $cat_id ).'-'.esc_attr( $no_item ).'">';
+    		$new_posts = '<div class="df-block-inner-megamenu-'.esc_attr( $cat_id ).'-'.esc_attr( $no_item ).'">';
     		$new_posts .= 'category: '.$cat_id;
     		$new_posts .= 'posts_per_page: '. $posts_per_page;
     		$new_posts .= 'offset: '.$offset;
